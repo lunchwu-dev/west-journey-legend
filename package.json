@@ -1,0 +1,23 @@
+{
+  "name": "xiyouji-kids",
+  "version": "1.5.0",
+  "description": "西游记 · 小朋友的睡前故事 - 高还原度儿童版连载网站",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lunchwu-dev/west-journey-legend.git"
+  },
+  "keywords": ["xiyouji", "kids", "story", "chinese-classic"],
+  "author": "吴八哥",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lunchwu-dev/west-journey-legend/issues"
+  },
+  "homepage": "https://github.com/lunchwu-dev/west-journey-legend#readme",
+  "dependencies": {
+    "nodemailer": "^9.0.1"
+  }
+}

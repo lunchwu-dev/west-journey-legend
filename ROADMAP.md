@@ -71,22 +71,59 @@
 
 ## 四、每日定时任务配置（v2.1 更新）
 
-### 当前配置
+### 当前配置（已实施）
 
 | 项目 | 值 |
 |------|-----|
 | 任务名称 | 西游记每日连载更新 |
-| 执行时间 | 每日 22:00 |
+| 执行时间 | 每日 22:00（北京时间）|
 | 更新章节数 | 2 章/天 |
 | 内容标准 | v2.0 高还原度儿童版 |
 | 章节规划版本 | v2.0（100章完整规划） |
 | 当前进度 | currentChapter=11（第1-10章已完成） |
+| **邮件通知** | ✅ **已启用** - 更新完成后自动发送邮件通知 |
+
+### 邮件通知配置
+
+**收件人**：
+- lunchwu@qq.com
+- leanna.li@decathlon.com
+- tia.song@decathlon.com
+
+**邮件内容**：
+- 主题：🐒 西游记新故事解锁！第X、X回已更新
+- 正文：新解锁章节列表 + 直接访问链接
+- 发送方：lunchwu@qq.com（使用 QQ 邮箱 SMTP）
+
+### 定时任务执行流程
+
+```
+1. 每日 22:00 自动触发 GitHub Actions
+2. 检出代码
+3. 生成新章节内容（2章）
+   - 更新 chapters.json
+   - 更新 progress.json 的 lastUpdate 时间
+4. 提交并推送更改到 GitHub
+5. 调用邮件发送脚本（scripts/send-notification-email.js）
+6. 发送通知邮件给所有收件人
+```
+
+### GitHub Secrets 配置要求
+
+需要在 GitHub 仓库中配置以下 secrets：
+
+| Secret 名称 | 说明 | 获取方式 |
+|------------|------|----------|
+| `QQ_EMAIL_FROM` | 发送方邮箱地址 | 固定值：lunchwu@qq.com |
+| `QQ_EMAIL_AUTH_CODE` | QQ 邮箱 SMTP 授权码 | QQ 邮箱设置 → 账户 → 开启 SMTP 服务 → 生成授权码 |
+| `NOTIFICATION_EMAILS` | 收件人邮箱列表（逗号分隔） | 固定值：lunchwu@qq.com,leanna.li@decathlon.com,tia.song@decathlon.com |
 
 ### 定时任务 prompt 更新状态
 
 - [x] **内容风格**：从 v1.0 压缩版更新为 v2.0 高还原度版
 - [x] **章节规划**：从 6 章压缩版更新为 100 章完整版
 - [x] **文件目录**：从 `website/` 子目录更新为根目录结构
+- [x] **邮件通知**：添加更新完成后的邮件通知功能
 - [ ] **插图生成标准**：需按 v2.0 新内容评估是否重新生成（第1-10章）
 
 ---

@@ -1,20 +1,20 @@
-# 临时文件和缓存
+# 依赖
+node_modules/
+package-lock.json
+
+# 生成的内容
+generated-images/
 *.log
-*.tmp
+
+# 系统文件
 .DS_Store
 Thumbs.db
 
-# 工作目录
+# IDE 文件
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# WorkBuddy
 .workbuddy/
-.git/
-
-# 旧的备份文件
-*.bak
-*_old_backup.json
-build_chapters*.py
-
-# 飞书授权二维码
-feishu_auth_qr.png
-
-# 临时文档
-overview.md

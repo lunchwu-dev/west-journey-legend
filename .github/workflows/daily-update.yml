@@ -1,0 +1,53 @@
+name: 西游记每日连载更新
+
+on:
+  schedule:
+    # 每日 22:00 (北京时间) = 14:00 UTC
+    - cron: '0 14 * * *'
+  workflow_dispatch:  # 支持手动触发
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          repository: lunchwu-dev/west-journey-legend
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 设置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: 生成新章节内容 (模拟)
+        run: |
+          echo "模拟生成新章节内容..."
+          # 这里应该是实际的章节生成逻辑
+          # 例如：调用 AI API 生成内容，更新 chapters.json
+          # 临时方案：更新 progress.json 中的 lastUpdate 时间
+          node -e "
+            const fs = require('fs');
+            const progress = JSON.parse(fs.readFileSync('data/progress.json', 'utf8'));
+            progress.lastUpdate = new Date().toISOString().replace('T', ' ').substring(0, 19);
+            fs.writeFileSync('data/progress.json', JSON.stringify(progress, null, 2));
+            console.log('Updated lastUpdate:', progress.lastUpdate);
+          "
+
+      - name: 提交并推送更改
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git add data/
+          git commit -m "每日连载更新 - $(date +'%Y-%m-%d')" || echo "No changes to commit"
+          git push
+
+      - name: 发送邮件通知
+        env:
+          QQ_EMAIL_FROM: ${{ secrets.QQ_EMAIL_FROM }}
+          QQ_EMAIL_AUTH_CODE: ${{ secrets.QQ_EMAIL_AUTH_CODE }}
+          NOTIFICATION_EMAILS: ${{ secrets.NOTIFICATION_EMAILS }}
+        run: |
+          node scripts/send-notification-email.js
