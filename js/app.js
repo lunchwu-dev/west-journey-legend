@@ -15,7 +15,7 @@
     chapters: [],
     totalChapters: 100,
     lastUpdate: '',
-    theme: localStorage.getItem('xyj_theme') || 'light',
+    theme: localStorage.getItem('west_journey_legend_theme') || 'light',
     currentChapterId: null,
     currentPage: 1,
     readChapters: loadReadChapters(),
@@ -24,7 +24,7 @@
   // ═─ Read State Management ═─
   function loadReadChapters() {
     try {
-      const raw = localStorage.getItem('xyj_read');
+      const raw = localStorage.getItem('west_journey_legend_read');
       return raw ? new Set(JSON.parse(raw)) : new Set();
     } catch (e) {
       return new Set();
@@ -32,7 +32,7 @@
   }
 
   function saveReadChapters() {
-    localStorage.setItem('xyj_read', JSON.stringify([...state.readChapters]));
+    localStorage.setItem('west_journey_legend_read', JSON.stringify([...state.readChapters]));
   }
 
   function markChapterAsRead(chapterId) {
@@ -132,7 +132,7 @@
     document.documentElement.setAttribute('data-theme', theme);
     dom.themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
     state.theme = theme;
-    localStorage.setItem('xyj_theme', theme);
+    localStorage.setItem('west_journey_legend_theme', theme);
   }
 
   dom.themeToggle.addEventListener('click', () => {

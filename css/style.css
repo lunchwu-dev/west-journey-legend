@@ -191,6 +191,10 @@ body {
 .cover-art { width: 100%; max-width: 520px; }
 .cover-svg { width: 100%; height: auto; color: var(--text); }
 
+/* 中国风书卷插图 */
+.cover-book-art { width: 100%; max-width: 480px; margin: 0 auto; padding: 0 20px; }
+.book-svg { width: 100%; height: auto; color: var(--text); }
+
 /* 标题 */
 .cover-title-block {
   display: flex;
