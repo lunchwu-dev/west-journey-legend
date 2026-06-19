@@ -1,21 +1,90 @@
 /**
  * 西游记连载 · 儿童版
- * 首页 + 极简目录 + 章节弹窗（含上下章导航 + 返回首页）
+ * 首页 + 极简目录 + 章节弹窗
+ * v2.1: 已读标记 + 锁定状态 + 分页 + 默认翻到最近已读页
  */
 
 (function () {
   'use strict';
 
-  // ── State ──
+  // ═─ Config ═─
+  const PAGE_SIZE = 10;
+
+  // ═─ State ═─
   const state = {
     chapters: [],
     totalChapters: 100,
     lastUpdate: '',
     theme: localStorage.getItem('xyj_theme') || 'light',
-    currentChapterId: null,   // 当前打开的章节 id
+    currentChapterId: null,
+    currentPage: 1,
+    readChapters: loadReadChapters(),
   };
 
-  // ── DOM ──
+  // ═─ Read State Management ═─
+  function loadReadChapters() {
+    try {
+      const raw = localStorage.getItem('xyj_read');
+      return raw ? new Set(JSON.parse(raw)) : new Set();
+    } catch (e) {
+      return new Set();
+    }
+  }
+
+  function saveReadChapters() {
+    localStorage.setItem('xyj_read', JSON.stringify([...state.readChapters]));
+  }
+
+  function markChapterAsRead(chapterId) {
+    if (state.readChapters.has(chapterId)) return;
+    state.readChapters.add(chapterId);
+    saveReadChapters();
+  }
+
+  function getDefaultPage() {
+    let latestReadId = 0;
+    for (const id of state.readChapters) {
+      if (id > latestReadId) latestReadId = id;
+    }
+    if (latestReadId === 0) return 1;
+    return Math.ceil(latestReadId / PAGE_SIZE);
+  }
+
+  // ═─ Build Full Chapter List (with locked placeholders) ═─
+  let _fullListCache = null;
+
+  function buildFullChapterList() {
+    if (_fullListCache) return _fullListCache;
+
+    const producedIds = new Set(state.chapters.map(c => c.id));
+    const fullList = [];
+
+    for (let id = 1; id <= state.totalChapters; id++) {
+      if (producedIds.has(id)) {
+        const ch = state.chapters.find(c => c.id === id);
+        fullList.push({ ...ch, locked: false });
+      } else {
+        fullList.push({
+          id,
+          title: `第${id}回（待更新）`,
+          originalTitle: '',
+          preview: '',
+          content: [],
+          images: [],
+          locked: true,
+        });
+      }
+    }
+
+    _fullListCache = fullList;
+    return fullList;
+  }
+
+  function invalidateFullListCache() {
+    _fullListCache = null;
+  }
+
+  // ═─ DOM ═─
   const $ = (sel) => document.querySelector(sel);
 
   const dom = {
@@ -25,6 +94,10 @@
     tocEmpty:             $('#tocEmpty'),
     tocChapterCount:      $('#tocChapterCount'),
     tocUpdateInfo:        $('#tocUpdateInfo'),
+    tocPageInfo:          $('#tocPageInfo'),
+    tocPrevPage:          $('#tocPrevPage'),
+    tocNextPage:          $('#tocNextPage'),
+    tocPageNumbers:       $('#tocPageNumbers'),
     modal:                $('#chapterModal'),
     modalBody:            $('#modalBody'),
     modalClose:           $('#modalClose'),
@@ -36,10 +109,9 @@
     modalGoToc:           $('#modalGoToc'),
     prevChapterTitle:     $('#prevChapterTitle'),
     nextChapterTitle:     $('#nextChapterTitle'),
-
   };
 
-  // ── Theme ──
+  // ═─ Theme ═─
   function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     dom.themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
@@ -51,7 +123,7 @@
     applyTheme(state.theme === 'dark' ? 'light' : 'dark');
   });
 
-  // ── Data ──
+  // ═─ Data ═─
   async function loadChapters() {
     try {
       const resp = await fetch('data/chapters.json');
@@ -60,40 +132,75 @@
       state.chapters      = data.chapters      || [];
       state.totalChapters = data.totalChapters || 100;
       state.lastUpdate    = data.lastUpdate    || '';
+      invalidateFullListCache();
     } catch (e) {
       console.warn('Could not load chapters', e);
       state.chapters = [];
     }
   }
 
-  // ── Render TOC ──
-  function renderToc() {
-    const chapters = state.chapters;
+  // ═─ Render TOC with Pagination ═─
+  function renderToc(page) {
+    const fullList = buildFullChapterList();
+    const totalPages = Math.ceil(fullList.length / PAGE_SIZE);
+
+    if (page < 1) page = 1;
+    if (page > totalPages) page = totalPages;
+    state.currentPage = page;
+
+    const startIdx = (page - 1) * PAGE_SIZE;
+    const endIdx = startIdx + PAGE_SIZE;
+    const pageChapters = fullList.slice(startIdx, endIdx);
 
     // Update meta bar
     dom.tocChapterCount.textContent =
-      `已更新 ${chapters.length} 回 / 共 ${state.totalChapters} 回`;
+      `已更新 ${state.chapters.length} 回 / 共 ${state.totalChapters} 回`;
 
     if (state.lastUpdate) {
-      dom.tocUpdateInfo.textContent = `最近更新：${state.lastUpdate}`;
+      dom.tocUpdateInfo.textContent = `最近更新：${escapeHtml(state.lastUpdate)}`;
     }
 
-    if (!chapters || chapters.length === 0) {
+    // Update pagination info
+    if (dom.tocPageInfo) {
+      dom.tocPageInfo.textContent = `第 ${page} 页 / 共 ${totalPages} 页`;
+    }
+
+    // Update pagination buttons
+    if (dom.tocPrevPage) dom.tocPrevPage.disabled = (page <= 1);
+    if (dom.tocNextPage) dom.tocNextPage.disabled = (page >= totalPages);
+
+    // Update page number buttons
+    renderPageNumbers(page, totalPages);
+
+    if (!pageChapters || pageChapters.length === 0) {
       dom.tocList.style.display = 'none';
-      dom.tocEmpty.style.display = 'block';
+      if (dom.tocEmpty) dom.tocEmpty.style.display = 'block';
       return;
     }
 
-    dom.tocEmpty.style.display = 'none';
+    if (dom.tocEmpty) dom.tocEmpty.style.display = 'none';
     dom.tocList.style.display  = 'flex';
 
-    // Find the two most recently updated chapters (last 2 in array)
+    // Find latest chapters for badge
     const latestIds = new Set(
-      chapters.slice(-2).map(c => c.id)
+      state.chapters.slice(-2).map(c => c.id)
     );
 
-    dom.tocList.innerHTML = chapters.map((ch, idx) => {
-      const isLatest = latestIds.has(ch.id);
+    dom.tocList.innerHTML = pageChapters.map((ch, idx) => {
+      const isRead = state.readChapters.has(ch.id);
+      const isLatest = latestIds.has(ch.id) && !ch.locked;
+
+      const readBadgeHtml = isRead && !ch.locked
+        ? `<div class="toc-read-badge">
+             <span class="read-tag">✓ 已读</span>
+           </div>`
+        : '';
+
+      const lockHtml = ch.locked
+        ? `<div class="toc-lock-badge">
+             <span class="lock-icon">🔒</span>
+           </div>`
+        : '';
 
       const latestBadgeHtml = isLatest
         ? `<div class="toc-latest-badge">
@@ -104,28 +211,41 @@
 
       return `
         <li
-          class="toc-item${isLatest ? ' is-latest' : ''}"
+          class="toc-item${isRead && !ch.locked ? ' is-read' : ''}${ch.locked ? ' is-locked' : ''}${isLatest ? ' is-latest' : ''}"
           data-chapter-id="${ch.id}"
+          data-locked="${ch.locked}"
           role="button"
           tabindex="0"
-          aria-label="第${ch.id}回 ${ch.title}"
+          aria-label="${ch.locked ? '第' + ch.id + '回（待更新）' : '第' + ch.id + '回 ' + ch.title}"
           style="animation-delay: ${idx * 30}ms"
         >
           <span class="toc-num">${ch.id}</span>
           <span class="toc-title">${escapeHtml(ch.title)}</span>
+          ${lockHtml}
+          ${readBadgeHtml}
           ${latestBadgeHtml}
         </li>
       `;
     }).join('');
 
-    // Click handlers
-    dom.tocList.querySelectorAll('.toc-item').forEach(item => {
-      item.addEventListener('click', () => openChapter(parseInt(item.dataset.chapterId)));
+    // Click handlers for unlocked items
+    dom.tocList.querySelectorAll('.toc-item:not(.is-locked)').forEach(item => {
+      item.addEventListener('click', () => {
+        openChapter(parseInt(item.dataset.chapterId));
+      });
       item.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           openChapter(parseInt(item.dataset.chapterId));
         }
+      });
+    });
+
+    // Click handlers for locked items
+    dom.tocList.querySelectorAll('.toc-item.is-locked').forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showLockToast();
       });
     });
 
@@ -143,22 +263,97 @@
     });
   }
 
-  // ── Chapter Detail Modal ──
+  function renderPageNumbers(currentPage, totalPages) {
+    if (!dom.tocPageNumbers) return;
 
-  /**
-   * 打开指定章节
-   * @param {number} chapterId
-   * @param {boolean} [scrollToTop=true] 是否滚动到顶部
-   */
+    // Show max 5 page buttons
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, startPage + 4);
+    if (endPage - startPage < 4) {
+      startPage = Math.max(1, endPage - 4);
+    }
+
+    let html = '';
+    if (startPage > 1) {
+      html += `<button class="page-num-btn" data-page="1">1</button>`;
+      if (startPage > 2) html += `<span class="page-ellipsis">…</span>`;
+    }
+
+    for (let p = startPage; p <= endPage; p++) {
+      html += `<button class="page-num-btn${p === currentPage ? ' active' : ''}" data-page="${p}">${p}</button>`;
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) html += `<span class="page-ellipsis">…</span>`;
+      html += `<button class="page-num-btn" data-page="${totalPages}">${totalPages}</button>`;
+    }
+
+    dom.tocPageNumbers.innerHTML = html;
+
+    // Bind click handlers
+    dom.tocPageNumbers.querySelectorAll('.page-num-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const page = parseInt(btn.dataset.page);
+        goToPage(page);
+      });
+    });
+  }
+
+  function showLockToast() {
+    let toast = document.getElementById('lockToast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'lockToast';
+      toast.className = 'lock-toast';
+      toast.textContent = '📖 这一回还在准备中，先看看其他回吧～';
+      document.body.appendChild(toast);
+    }
+    toast.classList.add('active');
+    setTimeout(() => toast.classList.remove('active'), 2200);
+  }
+
+  function goToPage(page) {
+    renderToc(page);
+    scrollTocToTop();
+  }
+
+  function goToPrevPage() {
+    if (state.currentPage > 1) {
+      renderToc(state.currentPage - 1);
+      scrollTocToTop();
+    }
+  }
+
+  function goToNextPage() {
+    const totalPages = Math.ceil(buildFullChapterList().length / PAGE_SIZE);
+    if (state.currentPage < totalPages) {
+      renderToc(state.currentPage + 1);
+      scrollTocToTop();
+    }
+  }
+
+  function scrollTocToTop() {
+    const tocSection = document.getElementById('toc');
+    if (tocSection) {
+      tocSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  // ═─ Chapter Detail Modal ═─
+
   function openChapter(chapterId, scrollToTop = true) {
-    const idx     = state.chapters.findIndex(c => c.id === chapterId);
-    const chapter = state.chapters[idx];
-    if (!chapter) return;
+    const fullList = buildFullChapterList();
+    const idx     = fullList.findIndex(c => c.id === chapterId);
+    const chapter = fullList[idx];
+    if (!chapter || chapter.locked) return;
 
     state.currentChapterId = chapterId;
 
-    const prevChapter = idx > 0                            ? state.chapters[idx - 1] : null;
-    const nextChapter = idx < state.chapters.length - 1   ? state.chapters[idx + 1] : null;
+    // Mark as read
+    markChapterAsRead(chapterId);
+
+    const prevChapter = idx > 0                            ? fullList[idx - 1] : null;
+    const nextChapter = idx < fullList.length - 1   ? fullList[idx + 1] : null;
 
     // ── 渲染内容 ──
     const blocks = (chapter.content || []).map(block => {
@@ -199,7 +394,7 @@
       `第 ${chapter.id} 回 · 共 ${state.chapters.length} 回`;
 
     // ── 更新底部导航按钮 ──
-    if (prevChapter) {
+    if (prevChapter && !prevChapter.locked) {
       dom.modalPrevChapter.disabled = false;
       dom.prevChapterTitle.textContent = prevChapter.title;
     } else {
@@ -207,7 +402,7 @@
       dom.prevChapterTitle.textContent = '已是第一章';
     }
 
-    if (nextChapter) {
+    if (nextChapter && !nextChapter.locked) {
       dom.modalNextChapter.disabled = false;
       dom.nextChapterTitle.textContent = nextChapter.title;
     } else {
@@ -220,7 +415,6 @@
     document.body.style.overflow = 'hidden';
 
     if (scrollToTop) {
-      // 弹窗内容区滚到顶部
       requestAnimationFrame(() => {
         const content = dom.modal.querySelector('.modal-content');
         if (content) content.scrollTop = 0;
@@ -236,23 +430,19 @@
     setTimeout(() => { dom.modalBody.innerHTML = ''; }, 400);
   }
 
-  // ── 导航事件绑定 ──
+  // ═─ 导航事件绑定 ═─
 
-  // 关闭弹窗（右上角 ✕）
   dom.modalClose.addEventListener('click', closeModal);
 
-  // 点击遮罩关闭
   dom.modal.addEventListener('click', (e) => {
     if (e.target === dom.modal) closeModal();
   });
 
-  // ESC 关闭
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && dom.modal.classList.contains('active')) {
       closeModal();
       return;
     }
-    // 键盘左右键切换章节
     if (dom.modal.classList.contains('active')) {
       if (e.key === 'ArrowLeft'  && !dom.modalPrevChapter.disabled) {
         navigateToPrev();
@@ -263,31 +453,37 @@
     }
   });
 
-  // 返回首页 / 目录
   dom.modalBackHome.addEventListener('click', closeModal);
   dom.modalGoToc.addEventListener('click', closeModal);
 
-  // 上一章
   dom.modalPrevChapter.addEventListener('click', navigateToPrev);
-
-  // 下一章
   dom.modalNextChapter.addEventListener('click', navigateToNext);
 
   function navigateToPrev() {
-    const idx = state.chapters.findIndex(c => c.id === state.currentChapterId);
+    const fullList = buildFullChapterList();
+    const idx = fullList.findIndex(c => c.id === state.currentChapterId);
     if (idx > 0) {
-      openChapter(state.chapters[idx - 1].id);
+      openChapter(fullList[idx - 1].id);
     }
   }
 
   function navigateToNext() {
-    const idx = state.chapters.findIndex(c => c.id === state.currentChapterId);
-    if (idx >= 0 && idx < state.chapters.length - 1) {
-      openChapter(state.chapters[idx + 1].id);
+    const fullList = buildFullChapterList();
+    const idx = fullList.findIndex(c => c.id === state.currentChapterId);
+    if (idx >= 0 && idx < fullList.length - 1) {
+      openChapter(fullList[idx + 1].id);
     }
   }
 
-  // ── Utility ──
+  // ═─ Pagination Event Bindings ═─
+  if (dom.tocPrevPage) {
+    dom.tocPrevPage.addEventListener('click', goToPrevPage);
+  }
+  if (dom.tocNextPage) {
+    dom.tocNextPage.addEventListener('click', goToNextPage);
+  }
+
+  // ═─ Utility ═─
   function escapeHtml(str) {
     if (!str) return '';
     const div = document.createElement('div');
@@ -295,11 +491,16 @@
     return div.innerHTML;
   }
 
-  // ── Init ──
+  // ═─ Init ═─
   async function init() {
     applyTheme(state.theme);
     await loadChapters();
-    renderToc();
+
+    // Calculate default page (recently read chapter's page)
+    const defaultPage = getDefaultPage();
+    state.currentPage = defaultPage;
+
+    renderToc(defaultPage);
   }
 
   init();

@@ -892,9 +892,231 @@ body {
   .modal-chapter-indicator { font-size: 12px; }
 }
 
-@media (max-width: 400px) {
-  .nav-btn-chapter-title { display: none; }
-  .nav-btn-direction { padding: 14px 10px; }
-  .toc-btn-inner { padding: 14px 8px; }
-  .scroll-icon { width: 22px; height: 22px; }
+/* ==================================================
+   分页响应式微调
+   ================================================== */
+
+@media (max-width: 640px) {
+  .toc-pagination {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .page-numbers {
+    order: -1;
+    flex-basis: 100%;
+    margin-bottom: 4px;
+  }
+}
+
+/* ==================================================
+   锁定提示 Toast
+   ================================================== */
+
+.lock-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--text);
+  color: var(--bg);
+  font-size: 13px;
+  font-family: var(--font-sans);
+  padding: 10px 20px;
+  border-radius: 24px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s var(--ease-smooth);
+  z-index: 3000;
+  white-space: nowrap;
+}
+
+.lock-toast.active {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+[data-theme="dark"] .lock-toast {
+  background: var(--bg-card);
+  color: var(--text);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+/* ==================================================
+   已读标记（追加到文件末尾，确保优先级）
+   ================================================== */
+
+/* 已读标记 */
+.toc-read-badge {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+.read-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: var(--gold);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+/* 锁定状态 */
+.toc-lock-badge {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+.lock-icon {
+  font-size: 14px;
+  opacity: 0.45;
+}
+
+/* 已读章节样式 */
+.toc-item.is-read .toc-title {
+  color: var(--text-2);
+}
+.toc-item.is-read .toc-num {
+  background: var(--text-muted);
+}
+.toc-item.is-read:hover .toc-title {
+  color: var(--red);
+}
+
+/* 锁定章节样式 */
+.toc-item.is-locked {
+  opacity: 0.55;
+  cursor: not-allowed;
+  filter: grayscale(0.3);
+}
+.toc-item.is-locked:hover {
+  background: transparent;
+  padding-left: 6px;
+}
+.toc-item.is-locked .toc-title {
+  color: var(--text-muted);
+}
+.toc-item.is-locked .toc-num {
+  background: var(--text-muted);
+}
+
+/* ==================================================
+   分页控件（追加到文件末尾，确保优先级）
+   ================================================== */
+
+.toc-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border);
+}
+
+/* 分页上一页/下一页按钮 */
+.toc-pagination > .page-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: var(--font-sans);
+  color: var(--text-2);
+  transition: border-color var(--dur-fast) ease,
+              color var(--dur-fast) ease,
+              background var(--dur-fast) ease,
+              opacity var(--dur-fast) ease;
+  white-space: nowrap;
+}
+.toc-pagination > .page-nav-btn:hover:not(:disabled) {
+  border-color: var(--red);
+  color: var(--red);
+  background: var(--red-dim);
+}
+.toc-pagination > .page-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* 分页 chevron SVG */
+.toc-pagination > .page-nav-btn .page-chevron {
+  width: 12px;
+  height: 20px;
+  flex-shrink: 0;
+  stroke: currentColor;
+  transition: transform var(--dur-fast) var(--ease-smooth);
+}
+.toc-pagination > .page-nav-btn:first-child:hover:not(:disabled) .page-chevron {
+  transform: translateX(-2px);
+}
+.toc-pagination > .page-nav-btn:last-child:hover:not(:disabled) .page-chevron {
+  transform: translateX(2px);
+}
+
+/* 页码容器 */
+.page-numbers {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 页码按钮 */
+.page-num-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  color: var(--text-2);
+  transition: border-color var(--dur-fast) ease,
+              background var(--dur-fast) ease,
+              color var(--dur-fast) ease;
+}
+.page-num-btn:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-2);
+}
+.page-num-btn.active {
+  background: var(--red);
+  color: #fff;
+  border-color: var(--red);
+  cursor: default;
+}
+
+/* 页码省略号 */
+.page-ellipsis {
+  font-size: 14px;
+  color: var(--text-muted);
+  width: 24px;
+  text-align: center;
+  user-select: none;
+}
+
+/* 页码信息 */
+.toc-page-info {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 8px;
+  letter-spacing: 0.05em;
 }

@@ -131,10 +131,30 @@
         <span class="toc-meta-update" id="tocUpdateInfo">每晚 22:00 更新</span>
       </div>
 
-      <!-- Chapter list (minimal) -->
+      <!-- Chapter list (paginated) -->
       <ol class="toc-list" id="tocList" aria-label="章节目录">
         <!-- Populated by JS -->
       </ol>
+
+      <!-- Pagination controls -->
+      <div class="toc-pagination" id="tocPagination" aria-label="目录分页">
+        <button class="page-nav-btn" id="tocPrevPage" aria-label="上一页" disabled>
+          <svg class="page-chevron" viewBox="0 0 16 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M12 3L4 14L12 25" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>上一页</span>
+        </button>
+        <div class="page-numbers" id="tocPageNumbers" aria-label="页码"></div>
+        <button class="page-nav-btn" id="tocNextPage" aria-label="下一页" disabled>
+          <span>下一页</span>
+          <svg class="page-chevron" viewBox="0 0 16 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M4 3L12 14L4 25" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Page info -->
+      <div class="toc-page-info" id="tocPageInfo" aria-label="页码信息"></div>
 
       <!-- Empty State -->
       <div class="toc-empty" id="tocEmpty" style="display:none;">
