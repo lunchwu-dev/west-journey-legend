@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="css/style.css?v=1.5">
+  <link rel="stylesheet" href="css/style.css?v=1.6">
 </head>
 <body>
 
@@ -218,6 +218,14 @@
           <span class="nav-label">回目录</span>
         </button>
         <span class="modal-chapter-indicator" id="modalChapterIndicator"></span>
+        <button class="modal-read-aloud" id="modalReadAloud" aria-label="朗读本章">
+          <svg class="read-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M3 10v4h4l5 4V6L7 10H3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" fill="currentColor" fill-opacity="0.15"/>
+            <path d="M15.5 8.5C16.8 9.5 17.5 11 17.5 12s-.7 2.5-2 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+            <path d="M18 6C20 7.8 21 10 21 12s-1 4.2-3 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span class="read-label">朗读</span>
+        </button>
         <button class="modal-close" id="modalClose" aria-label="关闭阅读">
           <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" width="14" height="14" aria-hidden="true">
             <path d="M5 5L15 15M15 5L5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
@@ -286,6 +294,6 @@
     </div>
   </div>
 
-  <script src="js/app.js?v=1.5"></script>
+  <script src="js/app.js?v=1.6"></script>
 </body>
 </html>

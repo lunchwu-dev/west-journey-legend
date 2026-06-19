@@ -1,7 +1,7 @@
 /**
  * 西游记连载 · 儿童版
  * 首页 + 极简目录 + 章节弹窗
- * v1.3: 删除最近更新标记功能，优化锁定状态逻辑（content为空也显示锁定）
+ * v1.6: 添加章节朗读功能（Web Speech API，分段朗读 + 段落高亮 + 语速优化）
  */
 
 (function () {
@@ -123,6 +123,7 @@
     modalPrevChapter:     $('#modalPrevChapter'),
     modalNextChapter:     $('#modalNextChapter'),
     modalGoToc:           $('#modalGoToc'),
+    modalReadAloud:       $('#modalReadAloud'),
     prevChapterTitle:     $('#prevChapterTitle'),
     nextChapterTitle:     $('#nextChapterTitle'),
   };
@@ -341,8 +342,149 @@
     setTimeout(() => toast.classList.remove('active'), 2200);
   }
 
+  // ═─ Text-to-Speech (朗读功能) ═─
+  const tts = {
+    synth: window.speechSynthesis,
+    voices: [],
+    selectedVoice: null,
+    isReading: false,
+    currentTexts: [],
+    currentIndex: 0,
+    paragraphEls: [],
+  };
+
+  function initVoices() {
+    if (!tts.synth) return;
+    const loadVoices = () => {
+      tts.voices = tts.synth.getVoices();
+      if (tts.voices.length === 0) return;
+      const zhVoices = tts.voices.filter(v => v.lang && v.lang.startsWith('zh'));
+      // 优先选择更自然的本地中文语音
+      tts.selectedVoice =
+        zhVoices.find(v => v.lang === 'zh-CN' && v.localService) ||
+        zhVoices.find(v => v.name.includes('Ting')) ||
+        zhVoices.find(v => v.name.includes('Yaoyao')) ||
+        zhVoices.find(v => v.name.includes('Xiaoxiao')) ||
+        zhVoices.find(v => v.name.includes('Huihui')) ||
+        zhVoices.find(v => v.name.includes('Yunxi')) ||
+        zhVoices.find(v => v.lang === 'zh-CN') ||
+        zhVoices[0] ||
+        null;
+    };
+    loadVoices();
+    if (tts.synth.onvoiceschanged !== undefined) {
+      tts.synth.onvoiceschanged = loadVoices;
+    }
+  }
+
+  function startReading() {
+    if (!tts.synth) {
+      showTtsToast('浏览器不支持语音朗读功能');
+      return;
+    }
+    if (tts.isReading) return;
+
+    const paragraphs = dom.modalBody.querySelectorAll('.content-block > p');
+    if (paragraphs.length === 0) {
+      showTtsToast('本章暂无可朗读的内容');
+      return;
+    }
+
+    tts.paragraphEls = Array.from(paragraphs);
+    tts.currentTexts = tts.paragraphEls.map(p => p.textContent.trim()).filter(t => t);
+    tts.currentIndex = 0;
+    tts.isReading = true;
+    updateReadAloudButton(true);
+    speakNextParagraph();
+  }
+
+  function speakNextParagraph() {
+    if (!tts.isReading) return;
+    // 跳过空文本
+    while (tts.currentIndex < tts.currentTexts.length && !tts.currentTexts[tts.currentIndex]) {
+      tts.currentIndex++;
+    }
+    if (tts.currentIndex >= tts.currentTexts.length) {
+      stopReading();
+      return;
+    }
+
+    // 清除上一段高亮
+    tts.paragraphEls.forEach(el => el.classList.remove('reading'));
+
+    const text = tts.currentTexts[tts.currentIndex];
+    const el = tts.paragraphEls[tts.currentIndex];
+    if (el) {
+      el.classList.add('reading');
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    const utter = new SpeechSynthesisUtterance(text);
+    if (tts.selectedVoice) utter.voice = tts.selectedVoice;
+    utter.lang = 'zh-CN';
+    utter.rate = 0.88;
+    utter.pitch = 1.02;
+    utter.volume = 1.0;
+
+    utter.onend = () => {
+      if (!tts.isReading) return;
+      tts.currentIndex++;
+      setTimeout(speakNextParagraph, 380);
+    };
+
+    utter.onerror = () => {
+      if (!tts.isReading) return;
+      tts.currentIndex++;
+      setTimeout(speakNextParagraph, 200);
+    };
+
+    tts.synth.speak(utter);
+  }
+
+  function stopReading() {
+    if (!tts.synth) return;
+    tts.isReading = false;
+    tts.synth.cancel();
+    tts.paragraphEls.forEach(el => el.classList.remove('reading'));
+    updateReadAloudButton(false);
+  }
+
+  function toggleReading() {
+    if (tts.isReading) {
+      stopReading();
+    } else {
+      startReading();
+    }
+  }
+
+  function updateReadAloudButton(isReading) {
+    if (!dom.modalReadAloud) return;
+    const label = dom.modalReadAloud.querySelector('.read-label');
+    if (isReading) {
+      dom.modalReadAloud.classList.add('is-reading');
+      if (label) label.textContent = '停止';
+    } else {
+      dom.modalReadAloud.classList.remove('is-reading');
+      if (label) label.textContent = '朗读';
+    }
+  }
+
+  function showTtsToast(msg) {
+    let toast = document.getElementById('ttsToast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'ttsToast';
+      toast.className = 'lock-toast';
+      document.body.appendChild(toast);
+    }
+    toast.textContent = msg;
+    toast.classList.add('active');
+    setTimeout(() => toast.classList.remove('active'), 2200);
+  }
+
   // ═─ Open Chapter ═─
   async function openChapter(chapterId) {
+    stopReading();
     const fullList = buildFullChapterList();
     const idx = fullList.findIndex(c => c.id === chapterId);
     if (idx < 0) return;
@@ -428,6 +570,7 @@
   }
 
   function closeModal() {
+    stopReading();
     dom.modal.classList.remove('active');
     document.body.style.overflow = '';
     state.currentChapterId = null;
@@ -478,6 +621,11 @@
   dom.modalPrevChapter.addEventListener('click', navigateToPrev);
   dom.modalNextChapter.addEventListener('click', navigateToNext);
 
+  // ═─ Read Aloud Button Event ═─
+  if (dom.modalReadAloud) {
+    dom.modalReadAloud.addEventListener('click', toggleReading);
+  }
+
   // ═─ TOC Navigation ═─
   if (dom.modalGoToc) {
     dom.modalGoToc.addEventListener('click', () => {
@@ -506,6 +654,7 @@
   // ═─ Init ═─
   async function init() {
     applyTheme(state.theme);
+    initVoices();
     await loadChapters();
 
     // Default to latest read page

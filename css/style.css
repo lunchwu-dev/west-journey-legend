@@ -642,6 +642,118 @@ body {
 
 
 /* ===================================================
+   朗读按钮
+   =================================================== */
+.modal-read-aloud {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px 5px 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: 20px;
+  background: var(--bg-2);
+  color: var(--text-2);
+  cursor: pointer;
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition:
+    border-color var(--dur-fast) ease,
+    color var(--dur-fast) ease,
+    background var(--dur-fast) ease,
+    transform var(--dur-fast) var(--ease-spring);
+}
+
+.modal-read-aloud:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(200, 160, 48, 0.08);
+  transform: translateY(-1px);
+}
+
+.modal-read-aloud:active { transform: translateY(0) scale(0.97); }
+
+.modal-read-aloud.is-reading {
+  border-color: var(--red);
+  color: #fff;
+  background: var(--red);
+  animation: readPulse 1.8s ease-in-out infinite;
+}
+
+.modal-read-aloud.is-reading:hover {
+  background: var(--red-light);
+  transform: translateY(-1px);
+}
+
+.read-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.modal-read-aloud.is-reading .read-icon {
+  animation: readIconBounce 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes readPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(224, 85, 69, 0.35); }
+  50%      { box-shadow: 0 0 0 6px rgba(224, 85, 69, 0); }
+}
+
+@keyframes readIconBounce {
+  0%   { transform: scale(1); }
+  100% { transform: scale(1.12); }
+}
+
+
+/* ===================================================
+   朗读段落高亮
+   =================================================== */
+.content-block > p.reading {
+  background: linear-gradient(
+    90deg,
+    rgba(200, 160, 48, 0.08) 0%,
+    rgba(200, 160, 48, 0.15) 50%,
+    rgba(200, 160, 48, 0.08) 100%
+  );
+  border-radius: 8px;
+  box-shadow:
+    inset 3px 0 0 var(--gold),
+    0 1px 6px rgba(200, 160, 48, 0.12);
+  padding-left: 12px;
+  padding-right: 8px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-left: -12px;
+  transition:
+    background 0.3s ease,
+    box-shadow 0.3s ease,
+    padding 0.3s ease,
+    margin 0.3s ease;
+}
+
+[data-theme="dark"] .content-block > p.reading {
+  background: linear-gradient(
+    90deg,
+    rgba(224, 184, 69, 0.10) 0%,
+    rgba(224, 184, 69, 0.18) 50%,
+    rgba(224, 184, 69, 0.10) 100%
+  );
+  box-shadow:
+    inset 3px 0 0 var(--gold-light),
+    0 1px 8px rgba(224, 184, 69, 0.15);
+}
+
+@media (max-width: 480px) {
+  .modal-read-aloud .read-label { display: none; }
+  .modal-read-aloud { padding: 6px; }
+  .read-icon { width: 20px; height: 20px; }
+}
+
+
+/* ===================================================
    弹窗底部章节导航  ——  重新设计版
    墨韵翻页条：左右朱砂扩散 + 中间卷轴目录
    =================================================== */
