@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>西游记 · 小朋友的睡前故事</title>
+  <meta name="description" content="专为一年级小朋友打造的西游记连载故事，每天更新2个章节，水墨插图，图文并茂！">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐒</text></svg>">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Ink Splash Background -->
+  <div class="ink-bg" aria-hidden="true">
+    <svg class="ink-splash ink-splash-1" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M80 150 Q120 80 200 100 Q280 120 320 200 Q360 280 250 260 Q140 240 80 150Z" fill="currentColor" opacity="0.04"/>
+    </svg>
+    <svg class="ink-splash ink-splash-2" viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M30 80 Q80 20 160 50 Q240 80 230 160 Q220 200 130 180 Q40 160 30 80Z" fill="currentColor" opacity="0.04"/>
+    </svg>
+  </div>
+
+  <!-- Theme Toggle -->
+  <button class="theme-toggle" id="themeToggle" aria-label="切换明暗主题" title="点我换颜色！">
+    <span class="theme-icon">🌙</span>
+  </button>
+
+  <!-- ===================== SINGLE PAGE: COVER + TOC ===================== -->
+  <main class="page-main">
+
+    <!-- ── COVER SECTION ── -->
+    <section class="book-cover">
+
+      <!-- Corner ornaments -->
+      <div class="corner-ornament corner-tl" aria-hidden="true">
+        <svg viewBox="0 0 60 60"><path d="M5 5 Q30 5 55 30 L55 55 L5 55 Z" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="5" cy="5" r="3" fill="currentColor"/></svg>
+      </div>
+      <div class="corner-ornament corner-tr" aria-hidden="true">
+        <svg viewBox="0 0 60 60"><path d="M55 5 Q30 5 5 30 L5 55 L55 55 Z" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="55" cy="5" r="3" fill="currentColor"/></svg>
+      </div>
+      <div class="corner-ornament corner-bl" aria-hidden="true">
+        <svg viewBox="0 0 60 60"><path d="M5 55 Q30 55 55 30 L55 5 L5 5 Z" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="5" cy="55" r="3" fill="currentColor"/></svg>
+      </div>
+      <div class="corner-ornament corner-br" aria-hidden="true">
+        <svg viewBox="0 0 60 60"><path d="M55 55 Q30 55 5 30 L5 5 L55 5 Z" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="55" cy="55" r="3" fill="currentColor"/></svg>
+      </div>
+
+      <div class="cover-inner">
+
+        <!-- Cover illustration -->
+        <div class="cover-art" aria-label="西游记封面插图">
+          <svg class="cover-svg" viewBox="0 0 500 240" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- Mountains -->
+            <path d="M0 200 Q60 140 120 165 Q160 120 200 100 Q240 80 280 115 Q310 90 360 60 Q400 40 440 80 Q470 100 500 90 L500 240 L0 240 Z" fill="currentColor" opacity="0.07"/>
+            <path d="M0 220 Q80 165 150 185 Q200 155 260 168 Q320 145 380 165 Q430 155 500 175 L500 240 L0 240 Z" fill="currentColor" opacity="0.05"/>
+            <!-- Clouds -->
+            <ellipse cx="80" cy="50" rx="50" ry="16" fill="currentColor" opacity="0.06"/>
+            <ellipse cx="100" cy="45" rx="32" ry="12" fill="currentColor" opacity="0.05"/>
+            <ellipse cx="380" cy="30" rx="55" ry="18" fill="currentColor" opacity="0.06"/>
+            <ellipse cx="400" cy="25" rx="35" ry="13" fill="currentColor" opacity="0.04"/>
+            <!-- Sun circle -->
+            <circle cx="430" cy="55" r="28" fill="currentColor" opacity="0.06"/>
+            <circle cx="430" cy="55" r="20" fill="currentColor" opacity="0.04"/>
+            <!-- Monkey silhouette -->
+            <g transform="translate(228, 68)" opacity="0.14">
+              <ellipse cx="22" cy="65" rx="17" ry="22" fill="currentColor"/>
+              <circle cx="22" cy="38" r="17" fill="currentColor"/>
+              <ellipse cx="22" cy="42" rx="10" ry="8" fill="white" opacity="0.55"/>
+              <circle cx="5" cy="36" r="6" fill="currentColor"/>
+              <circle cx="39" cy="36" r="6" fill="currentColor"/>
+              <rect x="14" y="16" width="16" height="4.5" rx="2.2" fill="currentColor" opacity="0.85"/>
+              <rect x="42" y="26" width="4" height="56" rx="2" fill="currentColor" opacity="0.9"/>
+            </g>
+            <!-- Decorative scroll line -->
+            <path d="M40 180 Q80 160 100 175 Q120 160 160 178 Q180 165 220 176" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.1" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <!-- Title block -->
+        <div class="cover-title-block">
+          <div class="title-deco-line" aria-hidden="true"></div>
+          <div class="cover-main-title">
+            <span class="title-char t-red">西</span>
+            <span class="title-char t-black">游</span>
+            <span class="title-char t-gold">记</span>
+          </div>
+          <div class="title-deco-line" aria-hidden="true"></div>
+        </div>
+
+        <!-- Subtitle -->
+        <div class="cover-subtitle">小朋友的睡前故事</div>
+
+        <!-- Brief intro -->
+        <div class="cover-intro">
+          <p>孙悟空、唐僧师父、猪八戒和沙和尚，</p>
+          <p>师徒四人一起去取经，每天给你讲一段精彩的冒险！</p>
+        </div>
+
+        <!-- Cover meta -->
+        <div class="cover-meta">
+          <div class="cover-meta-item"><span class="meta-icon">📖</span><span>共 100 回</span></div>
+          <div class="cover-meta-sep" aria-hidden="true">·</div>
+          <div class="cover-meta-item"><span class="meta-icon">🖌️</span><span>水墨插图版</span></div>
+          <div class="cover-meta-sep" aria-hidden="true">·</div>
+          <div class="cover-meta-item"><span class="meta-icon">⭐</span><span>适合一年级</span></div>
+        </div>
+
+        <!-- Divider with arrow pointing to TOC below -->
+        <div class="cover-to-toc-divider" aria-hidden="true">
+          <span class="divider-line"></span>
+          <span class="divider-text">目录</span>
+          <span class="divider-line"></span>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── TABLE OF CONTENTS ── -->
+    <section class="toc-section" id="toc">
+
+      <!-- TOC update info bar -->
+      <div class="toc-meta-bar">
+        <span class="toc-meta-chapters" id="tocChapterCount">加载中...</span>
+        <span class="toc-meta-sep">｜</span>
+        <span class="toc-meta-update" id="tocUpdateInfo">每晚 22:00 更新</span>
+      </div>
+
+      <!-- Chapter list (minimal) -->
+      <ol class="toc-list" id="tocList" aria-label="章节目录">
+        <!-- Populated by JS -->
+      </ol>
+
+      <!-- Empty State -->
+      <div class="toc-empty" id="tocEmpty" style="display:none;">
+        <p>故事还在路上，晚上22:00记得来看哦 🐒</p>
+      </div>
+
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <p>🌟 西游记 · 小朋友的睡前故事 · 每晚 22:00 准时更新 🌟</p>
+        <p class="footer-copy">内容专为一年级小朋友改编 · 水墨插图版</p>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- ── Chapter Detail Modal ── -->
+  <div class="modal-overlay" id="chapterModal" role="dialog" aria-modal="true" aria-label="章节详情">
+    <div class="modal-content">
+
+      <!-- 弹窗顶部导航栏 -->
+      <div class="modal-nav-bar">
+        <button class="modal-back-home" id="modalBackHome" aria-label="返回目录">
+          <svg class="back-arrow-svg" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M13 4L7 10L13 16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="nav-label">回目录</span>
+        </button>
+        <span class="modal-chapter-indicator" id="modalChapterIndicator"></span>
+        <button class="modal-close" id="modalClose" aria-label="关闭阅读">
+          <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" width="14" height="14" aria-hidden="true">
+            <path d="M5 5L15 15M15 5L5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- 正文区 -->
+      <div class="modal-body" id="modalBody"></div>
+
+      <!-- 弹窗底部章节导航 -->
+      <div class="modal-chapter-nav" id="modalChapterNav">
+
+        <!-- 上一章 -->
+        <button class="chapter-nav-btn prev-btn" id="modalPrevChapter" aria-label="上一章">
+          <div class="nav-btn-inner">
+            <div class="nav-btn-direction">
+              <svg class="nav-chevron" viewBox="0 0 16 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M12 3L4 14L12 25" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <div class="nav-btn-label-group">
+                <span class="nav-direction-text">前一回</span>
+                <span class="nav-btn-chapter-title" id="prevChapterTitle">—</span>
+              </div>
+            </div>
+            <div class="nav-ink-bar nav-ink-left"></div>
+          </div>
+        </button>
+
+        <!-- 目录 -->
+        <button class="chapter-nav-btn toc-btn" id="modalGoToc" aria-label="返回目录">
+          <div class="toc-btn-inner">
+            <!-- 卷轴图标 SVG -->
+            <svg class="scroll-icon" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect x="4" y="6" width="20" height="16" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/>
+              <line x1="8" y1="11" x2="20" y2="11" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+              <line x1="8" y1="14.5" x2="20" y2="14.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+              <line x1="8" y1="18" x2="16" y2="18" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+              <rect x="2" y="5" width="24" height="4" rx="2" fill="currentColor" opacity="0.15"/>
+              <rect x="2" y="19" width="24" height="4" rx="2" fill="currentColor" opacity="0.15"/>
+              <rect x="2" y="5" width="24" height="4" rx="2" stroke="currentColor" stroke-width="1" fill="none"/>
+              <rect x="2" y="19" width="24" height="4" rx="2" stroke="currentColor" stroke-width="1" fill="none"/>
+            </svg>
+            <span class="toc-btn-label">目录</span>
+          </div>
+        </button>
+
+        <!-- 下一章 -->
+        <button class="chapter-nav-btn next-btn" id="modalNextChapter" aria-label="下一章">
+          <div class="nav-btn-inner">
+            <div class="nav-ink-bar nav-ink-right"></div>
+            <div class="nav-btn-direction nav-btn-direction-right">
+              <div class="nav-btn-label-group nav-btn-label-right">
+                <span class="nav-direction-text">后一回</span>
+                <span class="nav-btn-chapter-title" id="nextChapterTitle">—</span>
+              </div>
+              <svg class="nav-chevron" viewBox="0 0 16 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M4 3L12 14L4 25" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

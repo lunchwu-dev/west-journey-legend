@@ -1,0 +1,15 @@
+{
+  "currentChapter": 11,
+  "totalChapters": 100,
+  "chaptersPerDay": 2,
+  "lastUpdateDate": "2026-06-19",
+  "updateSchedule": "每日22:00",
+  "websiteUrl": "https://lunchwu-dev.github.io/xiyouji/",
+  "styleGuidePath": "website/data/style-guide.json",
+  "chaptersFilePath": "website/data/chapters.json",
+  "imageOutputDir": "website/images",
+  "deployDirectory": "website",
+  "chapterPlanVersion": "v2.0",
+  "contentStyle": "高还原度儿童版（语言生动有文学感，章节连贯，尊重原著结构）",
+  "notes": "v2.0 重新设计章节规划：第1-10章重写完成（对应原著第1-3回）；第11-100章按新规划逐步生成"
+}

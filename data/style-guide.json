@@ -1,0 +1,62 @@
+{
+  "styleVersion": "1.0",
+  "description": "西游记儿童版 - 内容风格与视觉规范，确保每日连载一致性",
+
+  "textStyle": {
+    "targetAge": "6-7岁（小学一年级）",
+    "vocabularyLevel": "以一年级课本常用字（300-400字）为主，每段不超过3个生字，生字加拼音注释",
+    "sentenceLength": "每句8-15个字，避免复合句",
+    "paragraphLength": "每段3-5句话",
+    "tone": "活泼、亲切、像讲故事一样，多用'你看''哇''哎呀'等口语化表达",
+    "narrationStyle": "第三人称，直接称呼小朋友为'你'，互动式讲述",
+    "chapterLength": "每回600-800字（简化为儿童版）",
+    "dialogueRules": "对话用引号，每句对话前注明说话人（如：孙悟空说：'...'）",
+    "characterNames": "统一使用：孙悟空、唐僧师父、猪八戒、沙和尚、太白金星、玉皇大帝、观音菩萨、如来佛祖、白骨精、红孩儿等",
+    "forbiddenWords": "不使用：死、杀、鬼、妖（改用'怪''坏蛋'）、血腥暴力词汇",
+    "formatRules": "每个内容块用 <text> 和 <image> 交替排列，每回2-3个图片插入点",
+    "sampleStart": "很久很久以前，在大海中间有一座花果山。山上有好多好多桃子树，还有可爱的小猴子们在玩耍..."
+  },
+
+  "imageStyle": {
+    "artStyle": "中国传统水墨画风格，结合工笔与写意技法，线条遒劲有力，墨色层次丰富，具有浓厚的东方美学气韵",
+    "colorPalette": "以水墨黑白灰为主调，辅以朱砂红、赭石棕、藤黄色等传统矿物色点缀，整体色调含蓄雅致，具有宣纸质感",
+    "characterDesign": {
+      "孙悟空": {
+        "description": "金色毛发的聪慧猴子，头戴金色紧箍圈，身穿朱红色战袍，手持金箍棒，姿态矫健活泼，传统中国工笔人物画风格，面部神态生动",
+        "imagePromptKey": "Sun Wukong the Monkey King, golden-furred monkey hero, wearing golden circlet headband, dressed in red robe, holding golden staff (Ruyi Jingu Bang), dynamic heroic pose",
+        "keyFeatures": ["金色毛发", "朱红战袍", "金色紧箍圈", "金箍棒", "矫健姿态"]
+      },
+      "唐僧": {
+        "description": "慈眉善目的高僧，穿橙红袈裟，戴毗卢帽，神态温和安详，传统工笔佛教人物画风格",
+        "imagePromptKey": "Tang Sanzang the Buddhist monk, gentle face, wearing orange-red kasaya robe and Vairocana hat, holding nine-ring monk staff, serene and benevolent expression",
+        "keyFeatures": ["橙红袈裟", "毗卢帽", "九环锡杖", "温和神态"]
+      },
+      "猪八戒": {
+        "description": "胖乎乎憨态可掬的猪形神仙，大耳朵，圆肚子，黑布衣，扛着九齿钉耙，憨厚喜感十足",
+        "imagePromptKey": "Zhu Bajie the pig immortal, chubby figure with large ears and round belly, wearing dark robes, carrying nine-toothed rake, comical and good-natured expression",
+        "keyFeatures": ["大耳朵", "圆肚子", "九齿钉耙", "憨厚神态"]
+      },
+      "沙和尚": {
+        "description": "面容刚毅温厚的沙僧，颈挂骷髅项链和大佛珠，手持降妖宝杖，忠厚老实的形象",
+        "imagePromptKey": "Sha Wujing the river monk, strong gentle face, wearing large Buddhist prayer bead necklace, carrying monk's spade staff, loyal and steady expression",
+        "keyFeatures": ["大佛珠", "降妖宝杖", "刚毅神态"]
+      }
+    },
+    "composition": "画面留白充足体现东方美学，人物与山水互相呼应，前景精细后景写意，具有传统卷轴画的视觉节奏感",
+    "aspectRatio": "16:9 横版插图",
+    "styleNotes": "每张图需有统一的宣纸底色感，墨色晕染自然，不使用现代数字感过重的渲染，保持传统水墨笔触的书写性",
+    "moodKeywords": ["Chinese ink wash painting", "traditional sumi-e", "classical Chinese art", "brush painting", "xieyi style", "gongbi technique", "rice paper texture", "ink gradients", "landscape painting", "figure painting", "Eastern aesthetic", "calligraphic brushstrokes"],
+    "forbiddenElements": ["现代卡通风格", "日式kawaii", "扁平矢量风", "恐怖血腥元素", "过于写实的照片感", "数字感过重的渲染"],
+    "basePrompt": "Chinese ink wash painting style, traditional Chinese brush painting, sumi-e art technique, classical Chinese figure and landscape painting aesthetic, monochrome ink with subtle warm sepia and cinnabar accent tones, delicate and expressive brushstrokes, soft ink gradients from deep black to pale wash, rice paper texture feel, traditional gongbi-meets-xieyi style, masterpiece quality Chinese art"
+  },
+
+  "chapterTemplate": {
+    "structure": [
+      "标题（第X回 + 原著回目名 + 儿童友好简化标题）",
+      "开场引导语（1-2句互动式开场）",
+      "正文段落（3-5个段落，每段之间插入1张图片）",
+      "结尾互动（1-2句问小朋友的话）",
+      "明日预告（1句话吊胃口）"
+    ]
+  }
+}
