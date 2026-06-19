@@ -1,7 +1,7 @@
 /**
  * 西游记连载 · 儿童版
  * 首页 + 极简目录 + 章节弹窗
- * v2.1: 已读标记 + 锁定状态 + 分页 + 默认翻到最近已读页
+ * v1.2: 修复锁定状态标记 + 添加最近更新标记（显示日期时间）
  */
 
 (function () {
@@ -50,6 +50,24 @@
     return Math.ceil(latestReadId / PAGE_SIZE);
   }
 
+  // ═─ Utility Functions ═─
+  function escapeHtml(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function formatUpdateDate(dateStr) {
+    if (!dateStr) return '';
+    // dateStr format: "2026-06-19 22:00"
+    const parts = dateStr.split(' ');
+    if (parts.length < 2) return dateStr;
+    const datePart = parts[0].substring(5); // "06-19"
+    const timePart = parts[1].substring(0, 5); // "22:00"
+    return `${datePart} ${timePart}`;
+  }
+
   // ═─ Build Full Chapter List (with locked placeholders) ═─
   let _fullListCache = null;
 
@@ -66,12 +84,13 @@
       } else {
         fullList.push({
           id,
-          title: `第${id}回（待更新）`,
+          title: `第${id}回（未更新）`,
           originalTitle: '',
           preview: '',
           content: [],
           images: [],
           locked: true,
+          updateDate: null,
         });
       }
     }
@@ -157,7 +176,7 @@
       `已更新 ${state.chapters.length} 回 / 共 ${state.totalChapters} 回`;
 
     if (state.lastUpdate) {
-      dom.tocUpdateInfo.textContent = `最近更新：${escapeHtml(state.lastUpdate)}`;
+      dom.tocUpdateInfo.textContent = `最近更新：${state.lastUpdate}`;
     }
 
     // Update pagination info
@@ -181,10 +200,19 @@
     if (dom.tocEmpty) dom.tocEmpty.style.display = 'none';
     dom.tocList.style.display  = 'flex';
 
-    // Find latest chapters for badge
-    const latestIds = new Set(
-      state.chapters.slice(-2).map(c => c.id)
-    );
+    // Find recently updated chapters (within 3 days)
+    const now = new Date();
+    const threeDaysAgo = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000);
+    const latestIds = new Set();
+    
+    state.chapters.forEach(ch => {
+      if (ch.updateDate) {
+        const updateTime = new Date(ch.updateDate.replace(/-/g, '/'));
+        if (updateTime >= threeDaysAgo) {
+          latestIds.add(ch.id);
+        }
+      }
+    });
 
     dom.tocList.innerHTML = pageChapters.map((ch, idx) => {
       const isRead = state.readChapters.has(ch.id);
@@ -199,13 +227,14 @@
       const lockHtml = ch.locked
         ? `<div class="toc-lock-badge">
              <span class="lock-icon">🔒</span>
+             <span class="lock-text">未更新</span>
            </div>`
         : '';
 
-      const latestBadgeHtml = isLatest
+      const latestBadgeHtml = isLatest && ch.updateDate
         ? `<div class="toc-latest-badge">
-             <span class="latest-tag">🆕 最新更新</span>
-             <span class="latest-date">${escapeHtml(state.lastUpdate)}</span>
+             <span class="latest-tag">🆕 最近更新</span>
+             <span class="latest-date">${formatUpdateDate(ch.updateDate)}</span>
            </div>`
         : '';
 
@@ -216,7 +245,7 @@
           data-locked="${ch.locked}"
           role="button"
           tabindex="0"
-          aria-label="${ch.locked ? '第' + ch.id + '回（待更新）' : '第' + ch.id + '回 ' + ch.title}"
+          aria-label="${ch.locked ? '第' + ch.id + '回（未更新锁定状态）' : '第' + ch.id + '回 ' + ch.title}"
           style="animation-delay: ${idx * 30}ms"
         >
           <span class="toc-num">${ch.id}</span>
@@ -299,19 +328,6 @@
     });
   }
 
-  function showLockToast() {
-    let toast = document.getElementById('lockToast');
-    if (!toast) {
-      toast = document.createElement('div');
-      toast.id = 'lockToast';
-      toast.className = 'lock-toast';
-      toast.textContent = '📖 这一回还在准备中，先看看其他回吧～';
-      document.body.appendChild(toast);
-    }
-    toast.classList.add('active');
-    setTimeout(() => toast.classList.remove('active'), 2200);
-  }
-
   function goToPage(page) {
     renderToc(page);
     scrollTocToTop();
@@ -333,19 +349,35 @@
   }
 
   function scrollTocToTop() {
-    const tocSection = document.getElementById('toc');
-    if (tocSection) {
-      tocSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    const tocContent = document.querySelector('.toc-content');
+    if (tocContent) tocContent.scrollTop = 0;
   }
 
-  // ═─ Chapter Detail Modal ═─
+  // ═─ Lock Toast ═─
+  function showLockToast() {
+    let toast = document.getElementById('lockToast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'lockToast';
+      toast.className = 'lock-toast';
+      toast.textContent = '📖 这一回还未更新，先看看其他回吧～';
+      document.body.appendChild(toast);
+    }
+    toast.classList.add('active');
+    setTimeout(() => toast.classList.remove('active'), 2200);
+  }
 
-  function openChapter(chapterId, scrollToTop = true) {
+  // ═─ Open Chapter ═─
+  async function openChapter(chapterId) {
     const fullList = buildFullChapterList();
-    const idx     = fullList.findIndex(c => c.id === chapterId);
+    const idx = fullList.findIndex(c => c.id === chapterId);
+    if (idx < 0) return;
+
     const chapter = fullList[idx];
-    if (!chapter || chapter.locked) return;
+    if (chapter.locked) {
+      showLockToast();
+      return;
+    }
 
     state.currentChapterId = chapterId;
 
@@ -414,13 +446,11 @@
     dom.modal.classList.add('active');
     document.body.style.overflow = 'hidden';
 
-    if (scrollToTop) {
-      requestAnimationFrame(() => {
-        const content = dom.modal.querySelector('.modal-content');
-        if (content) content.scrollTop = 0;
-        dom.modal.scrollTop = 0;
-      });
-    }
+    requestAnimationFrame(() => {
+      const content = dom.modal.querySelector('.modal-content');
+      if (content) content.scrollTop = 0;
+      dom.modal.scrollTop = 0;
+    });
   }
 
   function closeModal() {
@@ -431,7 +461,6 @@
   }
 
   // ═─ 导航事件绑定 ═─
-
   dom.modalClose.addEventListener('click', closeModal);
 
   dom.modal.addEventListener('click', (e) => {
@@ -444,7 +473,7 @@
       return;
     }
     if (dom.modal.classList.contains('active')) {
-      if (e.key === 'ArrowLeft'  && !dom.modalPrevChapter.disabled) {
+      if (e.key === 'ArrowLeft' && !dom.modalPrevChapter.disabled) {
         navigateToPrev();
       }
       if (e.key === 'ArrowRight' && !dom.modalNextChapter.disabled) {
@@ -453,13 +482,8 @@
     }
   });
 
-  dom.modalBackHome.addEventListener('click', closeModal);
-  dom.modalGoToc.addEventListener('click', closeModal);
-
-  dom.modalPrevChapter.addEventListener('click', navigateToPrev);
-  dom.modalNextChapter.addEventListener('click', navigateToNext);
-
   function navigateToPrev() {
+    if (dom.modalPrevChapter.disabled) return;
     const fullList = buildFullChapterList();
     const idx = fullList.findIndex(c => c.id === state.currentChapterId);
     if (idx > 0) {
@@ -468,27 +492,37 @@
   }
 
   function navigateToNext() {
+    if (dom.modalNextChapter.disabled) return;
     const fullList = buildFullChapterList();
     const idx = fullList.findIndex(c => c.id === state.currentChapterId);
-    if (idx >= 0 && idx < fullList.length - 1) {
+    if (idx < fullList.length - 1) {
       openChapter(fullList[idx + 1].id);
     }
   }
 
-  // ═─ Pagination Event Bindings ═─
+  // ═─ TOC Navigation ═─
+  if (dom.modalGoToc) {
+    dom.modalGoToc.addEventListener('click', () => {
+      closeModal();
+      setTimeout(() => {
+        renderToc(state.currentPage);
+        scrollTocToTop();
+      }, 400);
+    });
+  }
+
+  if (dom.modalBackHome) {
+    dom.modalBackHome.addEventListener('click', () => {
+      closeModal();
+    });
+  }
+
   if (dom.tocPrevPage) {
     dom.tocPrevPage.addEventListener('click', goToPrevPage);
   }
+
   if (dom.tocNextPage) {
     dom.tocNextPage.addEventListener('click', goToNextPage);
-  }
-
-  // ═─ Utility ═─
-  function escapeHtml(str) {
-    if (!str) return '';
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
   }
 
   // ═─ Init ═─
@@ -496,12 +530,20 @@
     applyTheme(state.theme);
     await loadChapters();
 
-    // Calculate default page (recently read chapter's page)
-    const defaultPage = getDefaultPage();
-    state.currentPage = defaultPage;
+    // Default to latest read page
+    state.currentPage = getDefaultPage();
+    renderToc(state.currentPage);
 
-    renderToc(defaultPage);
+    // Update meta info
+    if (state.lastUpdate && dom.tocUpdateInfo) {
+      dom.tocUpdateInfo.textContent = `最近更新：${state.lastUpdate}`;
+    }
   }
 
-  init();
+  // Start
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 })();
