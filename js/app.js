@@ -474,6 +474,10 @@
     }
   }
 
+  // ═─ Chapter Navigation Button Events ═─
+  dom.modalPrevChapter.addEventListener('click', navigateToPrev);
+  dom.modalNextChapter.addEventListener('click', navigateToNext);
+
   // ═─ TOC Navigation ═─
   if (dom.modalGoToc) {
     dom.modalGoToc.addEventListener('click', () => {
