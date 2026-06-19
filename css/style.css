@@ -187,13 +187,12 @@ body {
   gap: var(--space-md);
 }
 
-/* 封面插图 SVG */
-.cover-art { width: 100%; max-width: 520px; }
-.cover-svg { width: 100%; height: auto; color: var(--text); }
+/* 封面插图 */
+.cover-art { width: 100%; max-width: 480px; margin: 0 auto; }
+.cover-img { width: 100%; height: auto; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.12); transition: transform 0.3s ease; }
+.cover-img:hover { transform: scale(1.02); }
 
-/* 中国风书卷插图 */
-.cover-book-art { width: 100%; max-width: 480px; margin: 0 auto; padding: 0 20px; }
-.book-svg { width: 100%; height: auto; color: var(--text); }
+[data-theme="dark"] .cover-img { box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
 
 /* 标题 */
 .cover-title-block {
