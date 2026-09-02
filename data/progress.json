@@ -1,9 +1,9 @@
 {
-  "currentChapter": 75,
+  "currentChapter": 77,
   "totalChapters": 100,
   "chaptersPerDay": 2,
-  "lastUpdateDate": "2026-09-01",
-  "lastUpdate": "2026-09-01 22:00",
+  "lastUpdateDate": "2026-09-02",
+  "lastUpdate": "2026-09-02 22:00",
   "updateSchedule": "每日22:00",
   "websiteUrl": "https://lunchwu-dev.github.io/xiyouji/",
   "styleGuidePath": "website/data/style-guide.json",
