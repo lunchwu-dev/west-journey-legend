@@ -1,9 +1,9 @@
 {
-  "currentChapter": 95,
-  "totalChapters": 100,
+  "currentChapter": 96,
+  "totalChapters": 95,
   "chaptersPerDay": 2,
-  "lastUpdateDate": "2026-09-02",
-  "lastUpdate": "2026-09-02 23:58",
+  "lastUpdateDate": "2026-09-03",
+  "lastUpdate": "2026-09-03 00:00",
   "updateSchedule": "每日22:00",
   "websiteUrl": "https://lunchwu-dev.github.io/xiyouji/",
   "styleGuidePath": "website/data/style-guide.json",
@@ -12,5 +12,5 @@
   "deployDirectory": "website",
   "chapterPlanVersion": "v2.0",
   "contentStyle": "高还原度儿童版（语言生动有文学感，章节连贯，尊重原著结构）",
-  "notes": "v2.0 重新设计章节规划：第1-10章重写完成（对应原著第1-3回）；第11-100章按新规划逐步生成；v1.5 标准应用至第25-26章（玄奘身世昭雪+唐王游地府）"
+  "notes": "v2.0 重新设计章节规划：第1-10章重写完成（对应原著第1-3回）；第11-95章按新规划逐步生成（终章第95回《回到灵山 终成正果》对应原著第100回末段）；v1.5 标准应用至第25-26章（玄奘身世昭雪+唐王游地府）。v1.6 每日连载已于 2026-09-03 完结，全书共 95 章，currentChapter 已置 96 表示无更多章节。"
 }
